@@ -143,6 +143,10 @@ $editlink3 = '</a></div>';
 $read1 = '<div><a class="'.$butreadmore.'" href="';
 $read2 = '">'.JText::_( 'PLG_CONTENT_HYARTICLE_BUTTON_READMORE' ).'</a></div>';
 
+/* Title HTML. Article id is appended during loop later. */
+$title1 = '<div class="contentheading">';
+$title2 = '</div>';
+
 /* View access levels of users */
 $access1 = $this->viewAccess($user1);
 
@@ -169,13 +173,16 @@ for ($i=0; $i<$max; $i++) {
 		/* Construct readmore link */
 		$read = $r->fulltext
 		? $read1.JRoute::_(ContentHelperRoute::getArticleRoute($r->id, $r->catid)).$read2 : "";
+		
+		/* Construct title */
+		$title = $arrS[$i][title][0] 
+		? $title = $title1.$r->title.$title2 : "";
 	
 		/* Construct the replaced content */
-		$arrD[$i] =  JHtml::_('content.prepare', $r->introtext).$read.$edit;
+		$arrD[$i] =  $title.JHtml::_('content.prepare', $r->introtext).$read.$edit;
 	}
 
 }
-
 
 return $arrD;
 }
