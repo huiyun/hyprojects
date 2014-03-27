@@ -123,6 +123,8 @@ protected function findArticle($arrS) {
 /* Get plugin params */
 $butreadmore = $this->params->get('hyarticle_readmore', 'hy-article');
 $butedit = $this->params->get('hyarticle_edit', 'hy-edit');
+$class_title="contentheading";
+$class_img="imtem-image";
 
 /* Initialised parameters */
 $max = sizeof($arrS);
@@ -134,6 +136,9 @@ $user1 = JFactory::getUser();
 $uri1 = JFactory::getURI();
 $date1 = JFactory::getDate();
 
+/* Clear float HTML. */
+$clear = '<div style="clear: both;"></div>';
+
 /* Frontend edit link HTML. Article id is appended during loop later. */
 $editlink1 = '<div><a class="'.$butedit.'" href="'.JURI::root().'index.php?task=article.edit&a_id=';
 $editlink2 = '&return='.base64_encode($uri1).'">'.JText::_( 'PLG_CONTENT_HYARTICLE_BUTTON_EDIT' ).' ';
@@ -144,8 +149,14 @@ $read1 = '<div><a class="'.$butreadmore.'" href="';
 $read2 = '">'.JText::_( 'PLG_CONTENT_HYARTICLE_BUTTON_READMORE' ).'</a></div>';
 
 /* Title HTML. Article id is appended during loop later. */
-$title1 = '<div class="contentheading">';
+$title1 = '<div class="'.$class_title.'">';
 $title2 = '</div>';
+
+/* Images HTML. Article id is appended during loop later. */
+$img1 = '<div class="'.$class_img.'" style="float:';
+$img2 = ';"><img src="';
+$img3 = '" alt="';
+$img4 = '" /></div>';
 
 /* View access levels of users */
 $access1 = $this->viewAccess($user1);
@@ -177,9 +188,24 @@ for ($i=0; $i<$max; $i++) {
 		/* Construct title */
 		$title = $arrS[$i][title][0] 
 		? $title = $title1.$r->title.$title2 : "";
+		
+		/* Construct Images */
+		if ($arrS[$i][introimg][0] || $arrS[$i][fullimg][0]) {
+			
+			$arrimg = json_decode($r->images,true);
+			
+			$imgintro = $arrS[$i][introimg][0]
+			? $img1.$arrimg[float_intro].$img2.$arrimg[image_intro].$img3.$arrimg[image_intro_alt].$img4 : "";
+			
+			$imgfull = $arrS[$i][fullimg][0]
+			? $img1.$arrimg[float_fulltext].$img2.$arrimg[image_fulltext].$img3.$arrimg[image_fulltext_alt].$img4 : "";
+		}
+		else {
+			$imgintro = $imgfull = "";
+		}		
 	
 		/* Construct the replaced content */
-		$arrD[$i] =  $title.JHtml::_('content.prepare', $r->introtext).$read.$edit;
+		$arrD[$i] =  $title.$imgintro.$imgfull.JHtml::_('content.prepare', $r->introtext).$clear.$read.$edit;
 	}
 
 }
