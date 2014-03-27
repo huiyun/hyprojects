@@ -18,4 +18,4 @@ echo $matches[0][introimg][0] ? "yes" : "no";
 echo "<br/>";
 echo $matches[0][fullimg][0] ? "yes" : "no";
 ?>
-</pre>
+</pre>.
