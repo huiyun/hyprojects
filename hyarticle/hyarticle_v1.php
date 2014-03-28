@@ -123,8 +123,10 @@ protected function findArticle($arrS) {
 /* Get plugin params */
 $butreadmore = $this->params->get('hyarticle_readmore', 'hy-article');
 $butedit = $this->params->get('hyarticle_edit', 'hy-edit');
-$class_title="contentheading";
-$class_img="imtem-image";
+$class_title = "contentheading";
+$class_imgintro = "hy-intro-image";
+$class_imgfull = "hy-full-image";
+$class_caption = "hy-caption";
 
 /* Initialised parameters */
 $max = sizeof($arrS);
@@ -153,10 +155,12 @@ $title1 = '<div class="'.$class_title.'">';
 $title2 = '</div>';
 
 /* Images HTML. Article id is appended during loop later. */
-$img1 = '<div class="'.$class_img.'" style="float:';
+$img1intro = '<div class="'.$class_imgintro.'" style="float:';
+$img1full = '<div class="'.$class_imgfull.'" style="float:';
 $img2 = ';"><img src="';
 $img3 = '" alt="';
-$img4 = '" /></div>';
+$img4 = '" /><div class="'.$class_caption.'">';
+$img5 = '</div></div>';
 
 /* View access levels of users */
 $access1 = $this->viewAccess($user1);
@@ -195,10 +199,10 @@ for ($i=0; $i<$max; $i++) {
 			$arrimg = json_decode($r->images,true);
 			
 			$imgintro = $arrS[$i][introimg][0]
-			? $img1.$arrimg[float_intro].$img2.$arrimg[image_intro].$img3.$arrimg[image_intro_alt].$img4 : "";
+			? $img1intro.$arrimg[float_intro].$img2.$arrimg[image_intro].$img3.$arrimg[image_intro_alt].$img4.$arrimg[image_intro_caption].$img5 : "";
 			
 			$imgfull = $arrS[$i][fullimg][0]
-			? $img1.$arrimg[float_fulltext].$img2.$arrimg[image_fulltext].$img3.$arrimg[image_fulltext_alt].$img4 : "";
+			? $img1full.$arrimg[float_fulltext].$img2.$arrimg[image_fulltext].$img3.$arrimg[image_fulltext_alt].$img4.$arrimg[image_fulltext_caption].$img5 : "";
 		}
 		else {
 			$imgintro = $imgfull = "";
