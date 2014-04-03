@@ -2,7 +2,7 @@
 
 /**
  * @package Plugin HY Article for Joomla! 3.1
- * @version hyarticle.php v3101 2013-09-01
+ * @version hyarticle.php v3110 2013-09-01
  * @author Huiyun Lu
  * @copyright (C) 2013 - HY Projects
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -57,7 +57,7 @@ public function onContentPrepare($context, &$article, &$params, $page = 0) {
 protected function gatherData($subject) {
 
 $matches=array();
-$pattern = '/{hyarticle (?P<id>\d+)(?P<title>;title)?(?P<introimg>;introimg)?(?P<fullimg>;fullimg)?}/';
+$pattern = '/{hyarticle (?P<id>\d+)(?P<title>;title)?(?P<introimg>;introimg)?(?P<fullimg>;fullimg)?(?P<nointro>;nointro)?(?P<fulltext>;fulltext)?}/';
 
 for ($i=0,$offset=0;;$i++) {
 	if (!preg_match ($pattern, $subject, $matches[$i], PREG_OFFSET_CAPTURE, $offset)) break;
@@ -192,7 +192,7 @@ for ($i=0; $i<$max; $i++) {
 		? $editlink1.$r->id.$editlink2.$r->title.$editlink3 : "";
 	
 		/* Construct readmore link */
-		$read = $r->fulltext
+		$read = $r->fulltext && !$arrS[$i][nointro][0] && !$arrS[$i][fulltext][0] 
 		? $read1.JRoute::_(ContentHelperRoute::getArticleRoute($r->id, $r->catid)).$read2 : "";
 		
 		/* Construct title */
@@ -214,10 +214,18 @@ for ($i=0; $i<$max; $i++) {
 		}
 		else {
 			$imgintro = $imgfull = "";
-		}		
+		}
+		
+		/* Construct intro text */
+		$introtext = $arrS[$i][nointro][0] 
+		? "" : JHtml::_('content.prepare', $r->introtext);
+		
+		/* Construct full text */
+		$fulltext = $arrS[$i][fulltext][0] 
+		? JHtml::_('content.prepare', $r->fulltext) : "";
 	
 		/* Construct the replaced content */
-		$arrD[$i] =  $title.$imgintro.$imgfull.JHtml::_('content.prepare', $r->introtext).$clear.$read.$edit;
+		$arrD[$i] =  $title.$imgintro.$imgfull.$introtext.$fulltext.$clear.$read.$edit;
 	}
 
 }
