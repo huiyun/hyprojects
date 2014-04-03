@@ -2,7 +2,7 @@
 
 /**
  * @package Plugin HY Article for Joomla! 3.1
- * @version hyarticle.php v3001 2013-09-01
+ * @version hyarticle.php v3101 2013-09-01
  * @author Huiyun Lu
  * @copyright (C) 2013 - HY Projects
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -170,6 +170,11 @@ $access1 = $this->viewAccess($user1);
 $nullDate = $db1->quote($db1->getNullDate());
 $nowDate = $db1->quote($date1->toSql());
 
+/* Get com_content global parameters */
+jimport('joomla.application.component.helper');
+$global_floatintro = JComponentHelper::getParams('com_content')->get('float_intro');
+$global_floatfull = JComponentHelper::getParams('com_content')->get('float_fulltext');
+
 for ($i=0; $i<$max; $i++) {
 
 	$query1 = $db1->getQuery(true);
@@ -194,14 +199,16 @@ for ($i=0; $i<$max; $i++) {
 		$title = $arrS[$i][title][0] 
 		? $title = $title1.$r->title.$title2 : "";
 		
-		/* Construct Images */
+		/* Construct images */
 		if ($arrS[$i][introimg][0] || $arrS[$i][fullimg][0]) {
 			
 			$arrimg = json_decode($r->images,true);
 			
+			if(!$arrimg[float_intro]) $arrimg[float_intro] = $global_floatintro;
 			$imgintro = $arrS[$i][introimg][0]
 			? $img1intro.$arrimg[float_intro].$img2.$arrimg[float_intro].$img3.$arrimg[image_intro].$img4.$arrimg[image_intro_alt].$img5.$arrimg[image_intro_caption].$img6 : "";
 			
+			if(!$arrimg[float_fulltext]) $arrimg[float_fulltext] = $global_floatfull;
 			$imgfull = $arrS[$i][fullimg][0]
 			? $img1full.$arrimg[float_fulltext].$img2.$arrimg[float_fulltext].$img3.$arrimg[image_fulltext].$img4.$arrimg[image_fulltext_alt].$img5.$arrimg[image_fulltext_caption].$img6 : "";
 		}
