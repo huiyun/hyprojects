@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<extension version="3.1" type="plugin" group="content">
+<extension version="3.1" type="plugin" group="content" method="upgrade">
 	<name>Content - HY Article</name>
         <author>Huiyun Lu</author>
         <creationDate>September 2013</creationDate>
@@ -7,7 +7,7 @@
         <license>http://www.gnu.org/licenses/gpl-3.0.html</license>
         <authorEmail>huiyun@cavemanintl.com</authorEmail>
         <authorUrl>www.joomla.org</authorUrl>
-        <version>3.1.0.0</version>
+        <version>3.1.1.0</version>
         <description>PLG_CONTENT_HYARTICLE_XML_DESCRIPTION</description>
 
 	 <files>
@@ -33,7 +33,27 @@
                                	<field name="hyarticle_edit" type="text" default="hy-edit" size="30"
                                		description="PLG_CONTENT_HYARTICLE_EDIT_DESC"
                                		label="PLG_CONTENT_HYARTICLE_EDIT_LABEL"                            
-                               		/>			
+                               		/>
+                               		
+                               	<field name="hyarticle_title" type="text" default="hy-title" size="30"
+                               		description="PLG_CONTENT_HYARTICLE_TITLE_DESC"
+                               		label="PLG_CONTENT_HYARTICLE_TITLE_LABEL"                            
+                               		/>
+                               		
+                               	<field name="hyarticle_imgintro" type="text" default="hy-imgintro" size="30"
+                               		description="PLG_CONTENT_HYARTICLE_IMGINTRO_DESC"
+                               		label="PLG_CONTENT_HYARTICLE_IMGINTRO_LABEL"                            
+                               		/>
+                               		
+                               	<field name="hyarticle_imgfull" type="text" default="hy-imgfull" size="30"
+                               		description="PLG_CONTENT_HYARTICLE_IMGFULL_DESC"
+                               		label="PLG_CONTENT_HYARTICLE_IMGFULL_LABEL"                            
+                               		/>
+                               		
+                               	<field name="hyarticle_caption" type="text" default="hy-caption" size="30"
+                               		description="PLG_CONTENT_HYARTICLE_CAPTION_DESC"
+                               		label="PLG_CONTENT_HYARTICLE_CAPTION_LABEL"                            
+                               		/>					
 
 			</fieldset>
 
