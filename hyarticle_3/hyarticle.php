@@ -2,7 +2,7 @@
 
 /**
  * @package Plugin HY Article for Joomla! 3.1
- * @version hyarticle.php v3001 2013-09-01
+ * @version hyarticle.php v3110 2013-09-01
  * @author Huiyun Lu
  * @copyright (C) 2013 - HY Projects
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -57,7 +57,7 @@ public function onContentPrepare($context, &$article, &$params, $page = 0) {
 protected function gatherData($subject) {
 
 $matches=array();
-$pattern = '/{hyarticle (?P<id>\d+)( title=(?P<title>[yn]))?}/';
+$pattern = '/{hyarticle (?P<id>\d+)(?P<title>;title)?(?P<introimg>;introimg)?(?P<fullimg>;fullimg)?(?P<nointro>;nointro)?(?P<fulltext>;fulltext)?}/';
 
 for ($i=0,$offset=0;;$i++) {
 	if (!preg_match ($pattern, $subject, $matches[$i], PREG_OFFSET_CAPTURE, $offset)) break;
@@ -123,17 +123,23 @@ protected function findArticle($arrS) {
 /* Get plugin params */
 $butreadmore = $this->params->get('hyarticle_readmore', 'hy-article');
 $butedit = $this->params->get('hyarticle_edit', 'hy-edit');
+$class_title = $this->params->get('hyarticle_title', 'hy-title');
+$class_imgintro = $this->params->get('hyarticle_imgintro', 'hy-imgintro');
+$class_imgfull = $this->params->get('hyarticle_imgfull', 'hy-imgfull');
+$class_caption = $this->params->get('hyarticle_caption', 'hy-caption');
 
 /* Initialised parameters */
 $max = sizeof($arrS);
 $arrD = array_fill(0,$max," ");
-$idstr = "";
 
 /* Joomla objects */
 $db1 = JFactory::getDBO();
 $user1 = JFactory::getUser();
 $uri1 = JFactory::getURI();
 $date1 = JFactory::getDate();
+
+/* Clear float HTML. */
+$clear = '<div style="clear: both;"></div>';
 
 /* Frontend edit link HTML. Article id is appended during loop later. */
 $editlink1 = '<div><a class="'.$butedit.'" href="'.JURI::root().'index.php?task=article.edit&a_id=';
@@ -144,41 +150,84 @@ $editlink3 = '</a></div>';
 $read1 = '<div><a class="'.$butreadmore.'" href="';
 $read2 = '">'.JText::_( 'PLG_CONTENT_HYARTICLE_BUTTON_READMORE' ).'</a></div>';
 
+/* Title HTML. Article id is appended during loop later. */
+$title1 = '<div class="'.$class_title.'">';
+$title2 = '</div>';
+
+/* Images HTML. Article id is appended during loop later. */
+$img1intro = '<div class="'.$class_imgintro;
+$img1full = '<div class="'.$class_imgfull;
+$img2 = '" style="float:';
+$img3 = ';"><img src="';
+$img4 = '" alt="';
+$img5 = '" /><div class="'.$class_caption.'">';
+$img6 = '</div></div>';
+
 /* View access levels of users */
 $access1 = $this->viewAccess($user1);
-
-/* Convert the array of article ids into integers and join them into a string separated by comma */
-for ($i=0; $i<$max; $i++) {
-	$idstr = $idstr.(int)$arrS[$i];
-	if ($i!=$max-1) $idstr = $idstr.",";
-}
 
 /* Filter by publish date */
 $nullDate = $db1->quote($db1->getNullDate());
 $nowDate = $db1->quote($date1->toSql());
 
-$query1 = $db1->getQuery(true);
-$query1->select('*')->from('#__content')
-	->where('id IN ('.$idstr.')')->where('state=1')->where('access IN ('.$access1.')')
-	->where('(publish_up = ' . $nullDate . ' OR publish_up <= ' . $nowDate . ')')
-	->where('(publish_down = ' . $nullDate . ' OR publish_down >= ' . $nowDate . ')');
+/* Get com_content global parameters */
+jimport('joomla.application.component.helper');
+$global_floatintro = JComponentHelper::getParams('com_content')->get('float_intro');
+$global_floatfull = JComponentHelper::getParams('com_content')->get('float_fulltext');
 
-$db1->setQuery($query1);
-$result1 = $db1->loadObjectList();
+for ($i=0; $i<$max; $i++) {
 
-foreach ($result1 as $r) {
-	/* Construct edit link */
-	$edit = $this->uCanEdit($user1, $r->id) || $this->uCanEditOwn($user1, $r->id, $r->created_by)
-	? $editlink1.$r->id.$editlink2.$r->title.$editlink3 : "";
-	/* Construct readmore link */
-	$read = $r->fulltext
-	? $read1.JRoute::_(ContentHelperRoute::getArticleRoute($r->id, $r->catid)).$read2 : "";
-	/* Construct the replaced content */
-	$content =  JHtml::_('content.prepare', $r->introtext).$read.$edit;
+	$query1 = $db1->getQuery(true);
+	$query1->select('*')->from('#__content')
+		->where('id='.(int)$arrS[$i][id][0])->where('state=1')->where('access IN ('.$access1.')')
+		->where('(publish_up = ' . $nullDate . ' OR publish_up <= ' . $nowDate . ')')
+		->where('(publish_down = ' . $nullDate . ' OR publish_down >= ' . $nowDate . ')');
 
-	for ($i=0; $i<$max; $i++) {
-		if ((int)$arrS[$i]==$r->id) $arrD[$i] = $content;				
-	}	
+	$db1->setQuery($query1);
+	$r = $db1->loadObject();
+
+	if($r) {
+		/* Construct edit link */
+		$edit = $this->uCanEdit($user1, $r->id) || $this->uCanEditOwn($user1, $r->id, $r->created_by)
+		? $editlink1.$r->id.$editlink2.$r->title.$editlink3 : "";
+
+		/* Construct readmore link */
+		$read = $r->fulltext && !$arrS[$i][nointro][0] && !$arrS[$i][fulltext][0] 
+		? $read1.JRoute::_(ContentHelperRoute::getArticleRoute($r->id, $r->catid)).$read2 : "";
+
+		/* Construct title */
+		$title = $arrS[$i][title][0] 
+		? $title = $title1.$r->title.$title2 : "";
+
+		/* Construct images */
+		if ($arrS[$i][introimg][0] || $arrS[$i][fullimg][0]) {
+
+			$arrimg = json_decode($r->images,true);
+
+			if(!$arrimg[float_intro]) $arrimg[float_intro] = $global_floatintro;
+			$imgintro = $arrS[$i][introimg][0]
+			? $img1intro.$arrimg[float_intro].$img2.$arrimg[float_intro].$img3.$arrimg[image_intro].$img4.$arrimg[image_intro_alt].$img5.$arrimg[image_intro_caption].$img6 : "";
+
+			if(!$arrimg[float_fulltext]) $arrimg[float_fulltext] = $global_floatfull;
+			$imgfull = $arrS[$i][fullimg][0]
+			? $img1full.$arrimg[float_fulltext].$img2.$arrimg[float_fulltext].$img3.$arrimg[image_fulltext].$img4.$arrimg[image_fulltext_alt].$img5.$arrimg[image_fulltext_caption].$img6 : "";
+		}
+		else {
+			$imgintro = $imgfull = "";
+		}
+
+		/* Construct intro text */
+		$introtext = $arrS[$i][nointro][0] 
+		? "" : JHtml::_('content.prepare', $r->introtext);
+
+		/* Construct full text */
+		$fulltext = $arrS[$i][fulltext][0] 
+		? JHtml::_('content.prepare', $r->fulltext) : "";
+
+		/* Construct the replaced content */
+		$arrD[$i] =  $title.$imgintro.$imgfull.$introtext.$fulltext.$clear.$read.$edit;
+	}
+
 }
 
 return $arrD;
@@ -193,9 +242,8 @@ protected function embedArticle(&$text) {
 
 	else {
 		$gather = $this->gatherData($text);
-		$find = $this->fillArray1($gather,0,0);
-		$replace1 = $this->fillArray1($gather,'id',0);
-		$replace = $this->findArticle($replace1);
+		$find = $this->fillArray1($gather,0,0);		
+		$replace = $this->findArticle($gather);
 		$text = str_replace($find, $replace, $text);
 
 		return true;
