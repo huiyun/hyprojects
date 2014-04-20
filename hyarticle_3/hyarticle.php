@@ -1,7 +1,7 @@
 ﻿<?php
 
 /**
- * @package Plugin HY Article for Joomla! 3.1
+ * @package Plugin HY Article for Joomla! 3.0+
  * @version hyarticle.php v3110 2013-09-01
  * @author Huiyun Lu
  * @copyright (C) 2013 - HY Projects
