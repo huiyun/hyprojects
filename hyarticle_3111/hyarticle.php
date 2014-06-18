@@ -139,16 +139,16 @@ $uri1 = JFactory::getURI();
 $date1 = JFactory::getDate();
 
 /* Clear float HTML. */
-$clear = '<div style="clear: both;"></div>';
+$clear = '<br/>';
 
 /* Frontend edit link HTML. Article id is appended during loop later. */
-$editlink1 = '<div><a class="'.$butedit.'" href="'.JURI::current().'?task=article.edit&a_id=';
+$editlink1 = '<a class="'.$butedit.'" href="'.JURI::current().'?task=article.edit&a_id=';
 $editlink2 = '&return='.base64_encode($uri1).'">'.JText::_( 'PLG_CONTENT_HYARTICLE_BUTTON_EDIT' ).' ';
-$editlink3 = '</a></div>';
+$editlink3 = '</a>';
 
 /* Readmore link HTML. Article id is appended during loop later. */
-$read1 = '<div><a class="'.$butreadmore.'" href="';
-$read2 = '">'.JText::_( 'PLG_CONTENT_HYARTICLE_BUTTON_READMORE' ).'</a></div>';
+$read1 = '<a class="'.$butreadmore.'" href="';
+$read2 = '"><span>'.JText::_( 'PLG_CONTENT_HYARTICLE_BUTTON_READMORE' ).'</span></a>';
 
 /* Title HTML. Article id is appended during loop later. */
 $title1 = '<div class="'.$class_title.'">';
@@ -189,11 +189,11 @@ for ($i=0; $i<$max; $i++) {
 	if($r) {
 		/* Construct edit link */
 		$edit = $this->uCanEdit($user1, $r->id) || $this->uCanEditOwn($user1, $r->id, $r->created_by)
-		? $editlink1.$r->id.$editlink2.$r->title.$editlink3 : "";
+		? $clear.$editlink1.$r->id.$editlink2.$r->title.$editlink3 : "";
 	
 		/* Construct readmore link */
 		$read = $r->fulltext && !$arrS[$i][nointro][0] && !$arrS[$i][fulltext][0] 
-		? $read1.JRoute::_(ContentHelperRoute::getArticleRoute($r->id, $r->catid)).$read2 : "";
+		? $clear.$read1.JRoute::_(ContentHelperRoute::getArticleRoute($r->id, $r->catid)).$read2 : "";
 		
 		/* Construct title */
 		$title = $arrS[$i][title][0] 
@@ -225,7 +225,7 @@ for ($i=0; $i<$max; $i++) {
 		? JHtml::_('content.prepare', $r->fulltext) : "";
 	
 		/* Construct the replaced content */
-		$arrD[$i] =  $title.$imgintro.$imgfull.$introtext.$fulltext.$clear.$read.$edit;
+		$arrD[$i] =  $title.$imgintro.$imgfull.$introtext.$fulltext.$read.$edit;
 	}
 
 }
