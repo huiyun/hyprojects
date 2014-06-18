@@ -142,7 +142,7 @@ $date1 = JFactory::getDate();
 $clear = '<div style="clear: both;"></div>';
 
 /* Frontend edit link HTML. Article id is appended during loop later. */
-$editlink1 = '<div><a class="'.$butedit.'" href="'.JURI::root().'index.php?task=article.edit&a_id=';
+$editlink1 = '<div><a class="'.$butedit.'" href="'.JURI::current().'?task=article.edit&a_id=';
 $editlink2 = '&return='.base64_encode($uri1).'">'.JText::_( 'PLG_CONTENT_HYARTICLE_BUTTON_EDIT' ).' ';
 $editlink3 = '</a></div>';
 
